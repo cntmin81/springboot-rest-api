@@ -4,7 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import cntmin81.github.io.springbootrestapi.model.Hello;
+import cntmin81.github.io.springbootrestapi.entity.Hello;
 
 @Controller
 public class HelloController {

@@ -1,4 +1,4 @@
-package cntmin81.github.io.springbootrestapi.model;
+package cntmin81.github.io.springbootrestapi.entity;
 
 import lombok.Data;
 
