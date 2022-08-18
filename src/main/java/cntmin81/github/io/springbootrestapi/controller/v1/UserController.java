@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import cntmin81.github.io.springbootrestapi.advice.exception.UserNotFoundException;
 import cntmin81.github.io.springbootrestapi.entity.User;
 import cntmin81.github.io.springbootrestapi.model.CommonResult;
 import cntmin81.github.io.springbootrestapi.model.ListResult;
@@ -27,9 +28,19 @@ public class UserController {
     @Autowired
     private UserRepo userRepo;
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/id/{userId}")
     public SingleResult<User> findUserById(@PathVariable Long userId) {
-        return responseService.getSingleResult(userRepo.findById(userId).orElse(null));
+        return responseService.getSingleResult(userRepo.findById(userId).orElseThrow(UserNotFoundException::new));
+    }
+
+    @GetMapping("/user/email/{email}")
+    public SingleResult<User> findUserByEmail(@PathVariable String email) {
+        User user = userRepo.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException();
+        } else {
+            return responseService.getSingleResult(user);
+        }
     }
 
     @GetMapping("/users")
