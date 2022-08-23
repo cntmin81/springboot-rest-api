@@ -10,59 +10,56 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import cntmin81.github.io.springbootrestapi.advice.exception.UserNotFoundException;
-import cntmin81.github.io.springbootrestapi.entity.User;
+import cntmin81.github.io.springbootrestapi.dto.user.UserRequestDto;
+import cntmin81.github.io.springbootrestapi.dto.user.UserResponseDto;
 import cntmin81.github.io.springbootrestapi.model.CommonResult;
 import cntmin81.github.io.springbootrestapi.model.ListResult;
 import cntmin81.github.io.springbootrestapi.model.SingleResult;
-import cntmin81.github.io.springbootrestapi.repository.UserRepo;
 import cntmin81.github.io.springbootrestapi.service.ResponseService;
+import cntmin81.github.io.springbootrestapi.service.UserService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/v1")
+@RequiredArgsConstructor
 public class UserController {
 
     @Autowired
     private ResponseService responseService;
 
     @Autowired
-    private UserRepo userRepo;
+    private UserService userService;
 
     @GetMapping("/user/id/{userId}")
-    public SingleResult<User> findUserById(@PathVariable Long userId) {
-        return responseService.getSingleResult(userRepo.findById(userId).orElseThrow(UserNotFoundException::new));
+    public SingleResult<UserResponseDto> findUserById(@PathVariable Long userId) {
+        return responseService.getSingleResult(userService.findById(userId));
     }
 
     @GetMapping("/user/email/{email}")
-    public SingleResult<User> findUserByEmail(@PathVariable String email) {
-        User user = userRepo.findByEmail(email);
-        if (user == null) {
-            throw new UserNotFoundException();
-        } else {
-            return responseService.getSingleResult(user);
-        }
+    public SingleResult<UserResponseDto> findUserByEmail(@PathVariable String email) {
+        return responseService.getSingleResult(userService.findByEmail(email));
     }
 
     @GetMapping("/users")
-    public ListResult<User> findAllUser() {
-        return responseService.getListResult(userRepo.findAll());
+    public ListResult<UserResponseDto> findAllUser() {
+        return responseService.getListResult(userService.findAllUser());
     }
 
     @PostMapping("/user")
-    public SingleResult<User> save(@RequestParam String email, @RequestParam String name) {
-        User user = User.builder().email(email).name(name).build();
-        return responseService.getSingleResult(userRepo.save(user));
+    public SingleResult<Long> save(@RequestParam String email, @RequestParam String name) {
+        UserRequestDto user = UserRequestDto.builder().email(email).name(name).build();
+        return responseService.getSingleResult(userService.save(user));
     }
 
     @PutMapping("/user")
-    public SingleResult<User> modify(@RequestParam Long userId, @RequestParam String email, @RequestParam String name) {
-        User user = User.builder().id(userId).email(email).name(name).build();
-        return responseService.getSingleResult(userRepo.save(user));
+    public SingleResult<Long> modify(@RequestParam Long userId, @RequestParam String email, @RequestParam String name) {
+        UserRequestDto user = UserRequestDto.builder().email(email).name(name).build();
+        return responseService.getSingleResult(userService.update(userId, user));
     }
 
     @DeleteMapping("/user/{userId}")
     public CommonResult delete(@PathVariable Long userId) {
-        userRepo.deleteById(userId);
+        userService.delete(userId);
         return responseService.getSuccessResult();
     }
 }
